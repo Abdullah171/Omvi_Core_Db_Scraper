@@ -1,1 +1,2 @@
-# Omvi_Core_Db_Scraper
+CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS postgis;

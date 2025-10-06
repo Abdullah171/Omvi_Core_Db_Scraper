@@ -1,0 +1,41 @@
+services:
+  db:
+    # Postgres 16 + PostGIS base, with pgvector added in ./db/Dockerfile
+    build:
+      context: ./db
+    container_name: galaxy-db
+    environment:
+      # set these in your .env (recommended) or they’ll use the defaults below
+      POSTGRES_DB: ${POSTGRES_DB:-galaxy}
+      POSTGRES_USER: ${POSTGRES_USER:-galaxy}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-galaxy}
+    ports:
+      # host:container — host is 5454 (from your .env), container stays 5432
+      - "${POSTGRES_PORT:-5454}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-galaxy} -d ${POSTGRES_DB:-galaxy}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  migrator:
+    build:
+      context: ./migrator
+    container_name: galaxy-migrator
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-galaxy}
+      DB_USER: ${POSTGRES_USER:-galaxy}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-galaxy}
+    volumes:
+      - ./sql:/app/sql:ro
+    command: ["python", "/app/migrate.py", "/app/sql/schema.sql"]
+
+volumes:
+  db_data:
