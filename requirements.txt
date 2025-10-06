@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+scrapy
+reportlab
+twisted
+pydantic
+scrapy-playwright
+chromium
+lxml-html-clean
