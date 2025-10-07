@@ -61,12 +61,8 @@ def insert_rows(conn, qualified_table: str, cols: List[str], rows: List[Dict[str
     for c in cols:
         t = (col_types.get(c) or '').lower()
         if t in ('json', 'jsonb'):
-            # let PG infer from the parameter's type; no explicit cast needed
             placeholders.append(sql.Placeholder())
         elif t == 'geometry':
-            # Expect WKT or GeoJSON string; try WKT first via ST_GeomFromText, else ST_GeomFromGeoJSON
-            # We pass the raw param and choose function at runtime in Python (below),
-            # so here we just put a placeholder.
             placeholders.append(sql.Placeholder())
         else:
             placeholders.append(sql.Placeholder())
@@ -98,12 +94,9 @@ def insert_rows(conn, qualified_table: str, cols: List[str], rows: List[Dict[str
                 return str(val)
             if isinstance(val, str):
                 try:
-                    # valid uuid string -> keep
                     return str(uuid.UUID(val))
                 except Exception:
-                    # make a stable UUID from the original string
                     return str(uuid.uuid5(UUID_NS, val))
-            # everything else -> stringify then map
             return str(uuid.uuid5(UUID_NS, str(val)))
 
         if t == 'geometry':
@@ -118,7 +111,6 @@ def insert_rows(conn, qualified_table: str, cols: List[str], rows: List[Dict[str
             return val
 
         return val
-
 
     with conn.cursor() as cur:
         for r in rows:
@@ -146,14 +138,18 @@ def main():
         conn.autocommit = False
 
         try:
-            # Seed order (matches your comment):
+            # Seed order:
             # 1) hexes
             insert_rows(conn, "public.hexes", [
                 "h3_id","resolution","country","country_alpha_3","country_alpha_2",
                 "geom","lng","lat","h3_cell_area","status","name","boundary_type",
                 "bearing_angle","bearing_label","state_alpha_2","state_fips",
                 "pop_total_h5","housing_total_h5","housing_occupied_h5","pop_density_h5",
-                "hex_estimated_value","hex_starting_bid","hex_current_bid","current_bid_token"
+                "hex_estimated_value","hex_starting_bid","hex_current_bid","current_bid_token",
+                # NEW FIELDS
+                "last_updated","number_of_bids","end_date","highest_bidder",
+                "previous_highest_bidder","completion_date","number_of_agents",
+                "number_of_watchers","next_bid"
             ], data.get("hexes", []))
 
             # 2) users, affiliate.users
@@ -207,23 +203,12 @@ def main():
                 "id","host_location_id","host_id","operator_id","created_at"
             ], data.get("threads", []))
 
-            # 10) operators, airnode_inventory
+            # 10) operators
             insert_rows(conn, "public.operators", [
                 "id","name","description","active","created_at"
             ], data.get("operators", []))
 
-            insert_rows(conn, "public.airnode_inventory", [
-                "id","created_at"
-            ], data.get("airnode_inventory", []))
-
-            # 11) host_location_operator_map
-            insert_rows(conn, "public.host_location_operator_map", [
-                "id","host_location_id","operator_id","airnode_inventory_id","thread_id",
-                "host_terms_accepted","operator_terms_accepted","contract_id",
-                "world_mobile_terms_processed","created_at"
-            ], data.get("host_location_operator_map", []))
-
-            # 12) payments
+            # 11) payments (MOVED EARLIER to satisfy FK in airnode_inventory)
             insert_rows(conn, "public.payments", [
                 "id","provider","provider_id","address_id","currency","total","paid","user_id",
                 "is_expired","bank_transfer_url","bank_transfer_payment_intent_id",
@@ -231,25 +216,40 @@ def main():
                 "created_at"
             ], data.get("payments", []))
 
-            # 13) accounts
+            # 12) airnode_inventory (now with all fields)
+            insert_rows(conn, "public.airnode_inventory", [
+                "id","uuid","model","payment_id","is_reserved",
+                "status_deposit_paid","status_purchased","status_shipped","status_delivered",
+                "status_waiting_on_deployment","status_deployed","status_provisioning","status_active",
+                "created_at"
+            ], data.get("airnode_inventory", []))
+
+            # 13) host_location_operator_map
+            insert_rows(conn, "public.host_location_operator_map", [
+                "id","host_location_id","operator_id","airnode_inventory_id","thread_id",
+                "host_terms_accepted","operator_terms_accepted","contract_id",
+                "world_mobile_terms_processed","created_at"
+            ], data.get("host_location_operator_map", []))
+
+            # 14) accounts
             insert_rows(conn, "public.accounts", [
                 "id","type","provider","provider_account_id","refresh_token","access_token",
                 "expires_at","token_type","scope","id_token","session_state","user_id",
                 "access_token_expires_at","refresh_token_expires_at","password","created_at"
             ], data.get("accounts", []))
 
-            # 14) admin_actions
+            # 15) admin_actions
             insert_rows(conn, "public.admin_actions", [
                 "id","admin_id","user_id","user_email","action_status","created_at"
             ], data.get("admin_actions", []))
 
-            # 15) cdr.earnings
+            # 16) cdr.earnings
             insert_rows(conn, "cdr.earnings", [
                 "id","month_start","month_year_raw","node_id","node_type","affiliate_user_id",
                 "operator_total","host_total","host_operator_total","created_at"
             ], data.get("cdr_earnings", []))
 
-            # 16) cart.user_linked_affiliates
+            # 17) cart.user_linked_affiliates
             insert_rows(conn, "cart.user_linked_affiliates", [
                 "user_id","affiliate_code","created_at"
             ], data.get("user_linked_affiliates", []))
@@ -264,6 +264,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 #docker compose run --rm   -e DB_HOST=db -e DB_PORT=5432 -e DB_NAME=galaxy -e DB_USER=galaxy -e DB_PASSWORD=galaxy   -v "$(pwd)/insert_data.py:/app/insert_data.py:ro"   -v "$(pwd)/data.json:/app/data.json:ro"   migrator python /app/insert_data.py --json /app/data.json

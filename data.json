@@ -1,17 +1,125 @@
 {
   "hexes": [
-    { "h3_id": "8928308280fffff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT", "geom": null, "lng": 14.285, "lat": 48.306, "h3_cell_area": 0.172, "status": "active", "name": "Linz Center", "boundary_type": "interior", "bearing_angle": 45.0, "bearing_label": "NE", "state_alpha_2": "AT", "state_fips": "07", "pop_total_h5": 8000, "housing_total_h5": 3500, "housing_occupied_h5": 3200, "pop_density_h5": 46000, "hex_estimated_value": 150000.0, "hex_starting_bid": 100000.0, "hex_current_bid": 120000.0, "current_bid_token": "WMT" },
-    { "h3_id": "8928308280bffff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT", "geom": null, "lng": 14.29, "lat": 48.3, "h3_cell_area": 0.172, "status": "active", "name": "Linz East", "boundary_type": "interior", "bearing_angle": 90.0, "bearing_label": "E", "state_alpha_2": "AT", "state_fips": "07", "pop_total_h5": 5000, "housing_total_h5": 2000, "housing_occupied_h5": 1800, "pop_density_h5": 30000, "hex_estimated_value": 90000.0, "hex_starting_bid": 60000.0, "hex_current_bid": 70000.0, "current_bid_token": "WMT" },
-    { "h3_id": "89283082807ffff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT", "geom": null, "lng": 14.28, "lat": 48.31, "h3_cell_area": 0.172, "status": "active", "name": "Linz North", "boundary_type": "interior", "bearing_angle": 0.0, "bearing_label": "N", "state_alpha_2": "AT", "state_fips": "07", "pop_total_h5": 6000, "housing_total_h5": 2500, "housing_occupied_h5": 2300, "pop_density_h5": 35000, "hex_estimated_value": 110000.0, "hex_starting_bid": 80000.0, "hex_current_bid": 90000.0, "current_bid_token": "WMT" },
-    { "h3_id": "89283082803ffff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT", "geom": null, "lng": 14.275, "lat": 48.299, "h3_cell_area": 0.172, "status": "active", "name": "Linz SouthWest", "boundary_type": "interior", "bearing_angle": 225.0, "bearing_label": "SW", "state_alpha_2": "AT", "state_fips": "07", "pop_total_h5": 4000, "housing_total_h5": 1800, "housing_occupied_h5": 1600, "pop_density_h5": 22000, "hex_estimated_value": 70000.0, "hex_starting_bid": 50000.0, "hex_current_bid": 55000.0, "current_bid_token": "WMT" },
-    { "h3_id": "89283082801ffff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT", "geom": null, "lng": 14.3, "lat": 48.32, "h3_cell_area": 0.172, "status": "active", "name": "Linz NorthEast", "boundary_type": "interior", "bearing_angle": 45.0, "bearing_label": "NE", "state_alpha_2": "AT", "state_fips": "07", "pop_total_h5": 4500, "housing_total_h5": 2000, "housing_occupied_h5": 1900, "pop_density_h5": 26000, "hex_estimated_value": 85000.0, "hex_starting_bid": 60000.0, "hex_current_bid": 70000.0, "current_bid_token": "WMT" },
-    { "h3_id": "89283082809ffff", "resolution": 8, "country": "Germany", "country_alpha_3": "DEU", "country_alpha_2": "DE", "geom": null, "lng": 13.405, "lat": 52.52, "h3_cell_area": 0.172, "status": "active", "name": "Berlin Center", "boundary_type": "interior", "bearing_angle": 0.0, "bearing_label": "N", "state_alpha_2": "BE", "state_fips": "11", "pop_total_h5": 20000, "housing_total_h5": 9000, "housing_occupied_h5": 8500, "pop_density_h5": 70000, "hex_estimated_value": 400000.0, "hex_starting_bid": 250000.0, "hex_current_bid": 300000.0, "current_bid_token": "WMT" },
-    { "h3_id": "8928308280dffff", "resolution": 8, "country": "Germany", "country_alpha_3": "DEU", "country_alpha_2": "DE", "geom": null, "lng": 13.41, "lat": 52.515, "h3_cell_area": 0.172, "status": "active", "name": "Berlin East", "boundary_type": "interior", "bearing_angle": 90.0, "bearing_label": "E", "state_alpha_2": "BE", "state_fips": "11", "pop_total_h5": 15000, "housing_total_h5": 7000, "housing_occupied_h5": 6500, "pop_density_h5": 50000, "hex_estimated_value": 320000.0, "hex_starting_bid": 200000.0, "hex_current_bid": 230000.0, "current_bid_token": "WMT" },
-    { "h3_id": "8928308280cffff", "resolution": 8, "country": "Germany", "country_alpha_3": "DEU", "country_alpha_2": "DE", "geom": null, "lng": 13.4, "lat": 52.53, "h3_cell_area": 0.172, "status": "active", "name": "Berlin West", "boundary_type": "interior", "bearing_angle": 270.0, "bearing_label": "W", "state_alpha_2": "BE", "state_fips": "11", "pop_total_h5": 18000, "housing_total_h5": 8000, "housing_occupied_h5": 7500, "pop_density_h5": 60000, "hex_estimated_value": 360000.0, "hex_starting_bid": 220000.0, "hex_current_bid": 260000.0, "current_bid_token": "WMT" },
-    { "h3_id": "8928308280effff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT", "geom": null, "lng": 14.275, "lat": 48.315, "h3_cell_area": 0.172, "status": "active", "name": "Linz NW", "boundary_type": "interior", "bearing_angle": 315.0, "bearing_label": "NW", "state_alpha_2": "AT", "state_fips": "07", "pop_total_h5": 3000, "housing_total_h5": 1400, "housing_occupied_h5": 1300, "pop_density_h5": 18000, "hex_estimated_value": 55000.0, "hex_starting_bid": 40000.0, "hex_current_bid": 45000.0, "current_bid_token": "WMT" },
-    { "h3_id": "8928308280f7fff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT", "geom": null, "lng": 14.295, "lat": 48.295, "h3_cell_area": 0.172, "status": "active", "name": "Linz SE", "boundary_type": "interior", "bearing_angle": 135.0, "bearing_label": "SE", "state_alpha_2": "AT", "state_fips": "07", "pop_total_h5": 3500, "housing_total_h5": 1600, "housing_occupied_h5": 1500, "pop_density_h5": 24000, "hex_estimated_value": 65000.0, "hex_starting_bid": 45000.0, "hex_current_bid": 55000.0, "current_bid_token": "WMT" },
-    { "h3_id": "89283082807bfff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT", "geom": null, "lng": 14.27, "lat": 48.285, "h3_cell_area": 0.172, "status": "active", "name": "Linz South", "boundary_type": "interior", "bearing_angle": 180.0, "bearing_label": "S", "state_alpha_2": "AT", "state_fips": "07", "pop_total_h5": 4500, "housing_total_h5": 2000, "housing_occupied_h5": 1850, "pop_density_h5": 26000, "hex_estimated_value": 85000.0, "hex_starting_bid": 60000.0, "hex_current_bid": 70000.0, "current_bid_token": "WMT" },
-    { "h3_id": "8928308280fbfff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT", "geom": null, "lng": 14.31, "lat": 48.3, "h3_cell_area": 0.172, "status": "active", "name": "Linz East2", "boundary_type": "interior", "bearing_angle": 90.0, "bearing_label": "E", "state_alpha_2": "AT", "state_fips": "07", "pop_total_h5": 4800, "housing_total_h5": 2100, "housing_occupied_h5": 1950, "pop_density_h5": 28000, "hex_estimated_value": 90000.0, "hex_starting_bid": 65000.0, "hex_current_bid": 75000.0, "current_bid_token": "WMT" }
+    {
+      "h3_id": "8928308280fffff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT",
+      "geom": null, "lng": 14.285, "lat": 48.306, "h3_cell_area": 0.172, "status": "active", "name": "Linz Center",
+      "boundary_type": "interior", "bearing_angle": 45.0, "bearing_label": "NE", "state_alpha_2": "AT", "state_fips": "07",
+      "pop_total_h5": 8000, "housing_total_h5": 3500, "housing_occupied_h5": 3200, "pop_density_h5": 46000,
+      "hex_estimated_value": 150000.0, "hex_starting_bid": 100000.0, "hex_current_bid": 120000.0, "current_bid_token": "WMT",
+      "last_updated": "2025-06-15T10:00:00Z", "number_of_bids": 7, "end_date": "2025-06-30T18:00:00Z",
+      "highest_bidder": "bidder_alpha", "previous_highest_bidder": "bidder_zeta",
+      "completion_date": "2025-06-30T18:05:00Z", "number_of_agents": 3, "number_of_watchers": 18, "next_bid": "125000 WMT"
+    },
+    {
+      "h3_id": "8928308280bffff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT",
+      "geom": null, "lng": 14.29, "lat": 48.3, "h3_cell_area": 0.172, "status": "active", "name": "Linz East",
+      "boundary_type": "interior", "bearing_angle": 90.0, "bearing_label": "E", "state_alpha_2": "AT", "state_fips": "07",
+      "pop_total_h5": 5000, "housing_total_h5": 2000, "housing_occupied_h5": 1800, "pop_density_h5": 30000,
+      "hex_estimated_value": 90000.0, "hex_starting_bid": 60000.0, "hex_current_bid": 70000.0, "current_bid_token": "WMT",
+      "last_updated": "2025-06-10T12:00:00Z", "number_of_bids": 4, "end_date": "2025-06-25T18:00:00Z",
+      "highest_bidder": "bidder_beta", "previous_highest_bidder": "bidder_alpha",
+      "completion_date": "2025-06-25T18:03:00Z", "number_of_agents": 2, "number_of_watchers": 12, "next_bid": "73500 WMT"
+    },
+    {
+      "h3_id": "89283082807ffff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT",
+      "geom": null, "lng": 14.28, "lat": 48.31, "h3_cell_area": 0.172, "status": "active", "name": "Linz North",
+      "boundary_type": "interior", "bearing_angle": 0.0, "bearing_label": "N", "state_alpha_2": "AT", "state_fips": "07",
+      "pop_total_h5": 6000, "housing_total_h5": 2500, "housing_occupied_h5": 2300, "pop_density_h5": 35000,
+      "hex_estimated_value": 110000.0, "hex_starting_bid": 80000.0, "hex_current_bid": 90000.0, "current_bid_token": "WMT",
+      "last_updated": "2025-06-12T09:00:00Z", "number_of_bids": 5, "end_date": "2025-06-28T18:00:00Z",
+      "highest_bidder": "bidder_gamma", "previous_highest_bidder": "bidder_beta",
+      "completion_date": "2025-06-28T18:02:00Z", "number_of_agents": 2, "number_of_watchers": 14, "next_bid": "94500 WMT"
+    },
+    {
+      "h3_id": "89283082803ffff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT",
+      "geom": null, "lng": 14.275, "lat": 48.299, "h3_cell_area": 0.172, "status": "active", "name": "Linz SouthWest",
+      "boundary_type": "interior", "bearing_angle": 225.0, "bearing_label": "SW", "state_alpha_2": "AT", "state_fips": "07",
+      "pop_total_h5": 4000, "housing_total_h5": 1800, "housing_occupied_h5": 1600, "pop_density_h5": 22000,
+      "hex_estimated_value": 70000.0, "hex_starting_bid": 50000.0, "hex_current_bid": 55000.0, "current_bid_token": "WMT",
+      "last_updated": "2025-06-08T10:00:00Z", "number_of_bids": 3, "end_date": "2025-06-22T18:00:00Z",
+      "highest_bidder": "bidder_delta", "previous_highest_bidder": "bidder_beta",
+      "completion_date": "2025-06-22T18:01:00Z", "number_of_agents": 1, "number_of_watchers": 9, "next_bid": "57750 WMT"
+    },
+    {
+      "h3_id": "89283082801ffff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT",
+      "geom": null, "lng": 14.3, "lat": 48.32, "h3_cell_area": 0.172, "status": "active", "name": "Linz NorthEast",
+      "boundary_type": "interior", "bearing_angle": 45.0, "bearing_label": "NE", "state_alpha_2": "AT", "state_fips": "07",
+      "pop_total_h5": 4500, "housing_total_h5": 2000, "housing_occupied_h5": 1900, "pop_density_h5": 26000,
+      "hex_estimated_value": 85000.0, "hex_starting_bid": 60000.0, "hex_current_bid": 70000.0, "current_bid_token": "WMT",
+      "last_updated": "2025-06-09T12:00:00Z", "number_of_bids": 4, "end_date": "2025-06-24T18:00:00Z",
+      "highest_bidder": "bidder_epsilon", "previous_highest_bidder": "bidder_delta",
+      "completion_date": "2025-06-24T18:03:00Z", "number_of_agents": 2, "number_of_watchers": 10, "next_bid": "73500 WMT"
+    },
+    {
+      "h3_id": "89283082809ffff", "resolution": 8, "country": "Germany", "country_alpha_3": "DEU", "country_alpha_2": "DE",
+      "geom": null, "lng": 13.405, "lat": 52.52, "h3_cell_area": 0.172, "status": "active", "name": "Berlin Center",
+      "boundary_type": "interior", "bearing_angle": 0.0, "bearing_label": "N", "state_alpha_2": "BE", "state_fips": "11",
+      "pop_total_h5": 20000, "housing_total_h5": 9000, "housing_occupied_h5": 8500, "pop_density_h5": 70000,
+      "hex_estimated_value": 400000.0, "hex_starting_bid": 250000.0, "hex_current_bid": 300000.0, "current_bid_token": "WMT",
+      "last_updated": "2025-06-18T15:00:00Z", "number_of_bids": 12, "end_date": "2025-07-01T18:00:00Z",
+      "highest_bidder": "bidder_kappa", "previous_highest_bidder": "bidder_iota",
+      "completion_date": "2025-07-01T18:06:00Z", "number_of_agents": 5, "number_of_watchers": 42, "next_bid": "315000 WMT"
+    },
+    {
+      "h3_id": "8928308280dffff", "resolution": 8, "country": "Germany", "country_alpha_3": "DEU", "country_alpha_2": "DE",
+      "geom": null, "lng": 13.41, "lat": 52.515, "h3_cell_area": 0.172, "status": "active", "name": "Berlin East",
+      "boundary_type": "interior", "bearing_angle": 90.0, "bearing_label": "E", "state_alpha_2": "BE", "state_fips": "11",
+      "pop_total_h5": 15000, "housing_total_h5": 7000, "housing_occupied_h5": 6500, "pop_density_h5": 50000,
+      "hex_estimated_value": 320000.0, "hex_starting_bid": 200000.0, "hex_current_bid": 230000.0, "current_bid_token": "WMT",
+      "last_updated": "2025-06-16T11:00:00Z", "number_of_bids": 8, "end_date": "2025-06-29T18:00:00Z",
+      "highest_bidder": "bidder_theta", "previous_highest_bidder": "bidder_eta",
+      "completion_date": "2025-06-29T18:04:00Z", "number_of_agents": 4, "number_of_watchers": 28, "next_bid": "241500 WMT"
+    },
+    {
+      "h3_id": "8928308280cffff", "resolution": 8, "country": "Germany", "country_alpha_3": "DEU", "country_alpha_2": "DE",
+      "geom": null, "lng": 13.4, "lat": 52.53, "h3_cell_area": 0.172, "status": "active", "name": "Berlin West",
+      "boundary_type": "interior", "bearing_angle": 270.0, "bearing_label": "W", "state_alpha_2": "BE", "state_fips": "11",
+      "pop_total_h5": 18000, "housing_total_h5": 8000, "housing_occupied_h5": 7500, "pop_density_h5": 60000,
+      "hex_estimated_value": 360000.0, "hex_starting_bid": 220000.0, "hex_current_bid": 260000.0, "current_bid_token": "WMT",
+      "last_updated": "2025-06-17T10:00:00Z", "number_of_bids": 9, "end_date": "2025-06-30T18:00:00Z",
+      "highest_bidder": "bidder_lambda", "previous_highest_bidder": "bidder_theta",
+      "completion_date": "2025-06-30T18:07:00Z", "number_of_agents": 4, "number_of_watchers": 31, "next_bid": "273000 WMT"
+    },
+    {
+      "h3_id": "8928308280effff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT",
+      "geom": null, "lng": 14.275, "lat": 48.315, "h3_cell_area": 0.172, "status": "active", "name": "Linz NW",
+      "boundary_type": "interior", "bearing_angle": 315.0, "bearing_label": "NW", "state_alpha_2": "AT", "state_fips": "07",
+      "pop_total_h5": 3000, "housing_total_h5": 1400, "housing_occupied_h5": 1300, "pop_density_h5": 18000,
+      "hex_estimated_value": 55000.0, "hex_starting_bid": 40000.0, "hex_current_bid": 45000.0, "current_bid_token": "WMT",
+      "last_updated": "2025-06-05T08:00:00Z", "number_of_bids": 2, "end_date": "2025-06-20T18:00:00Z",
+      "highest_bidder": "bidder_eta", "previous_highest_bidder": "bidder_delta",
+      "completion_date": "2025-06-20T18:01:00Z", "number_of_agents": 1, "number_of_watchers": 6, "next_bid": "47250 WMT"
+    },
+    {
+      "h3_id": "8928308280f7fff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT",
+      "geom": null, "lng": 14.295, "lat": 48.295, "h3_cell_area": 0.172, "status": "active", "name": "Linz SE",
+      "boundary_type": "interior", "bearing_angle": 135.0, "bearing_label": "SE", "state_alpha_2": "AT", "state_fips": "07",
+      "pop_total_h5": 3500, "housing_total_h5": 1600, "housing_occupied_h5": 1500, "pop_density_h5": 24000,
+      "hex_estimated_value": 65000.0, "hex_starting_bid": 45000.0, "hex_current_bid": 55000.0, "current_bid_token": "WMT",
+      "last_updated": "2025-06-11T09:30:00Z", "number_of_bids": 3, "end_date": "2025-06-26T18:00:00Z",
+      "highest_bidder": "bidder_zeta", "previous_highest_bidder": "bidder_eta",
+      "completion_date": "2025-06-26T18:02:00Z", "number_of_agents": 1, "number_of_watchers": 8, "next_bid": "57750 WMT"
+    },
+    {
+      "h3_id": "89283082807bfff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT",
+      "geom": null, "lng": 14.27, "lat": 48.285, "h3_cell_area": 0.172, "status": "active", "name": "Linz South",
+      "boundary_type": "interior", "bearing_angle": 180.0, "bearing_label": "S", "state_alpha_2": "AT", "state_fips": "07",
+      "pop_total_h5": 4500, "housing_total_h5": 2000, "housing_occupied_h5": 1850, "pop_density_h5": 26000,
+      "hex_estimated_value": 85000.0, "hex_starting_bid": 60000.0, "hex_current_bid": 70000.0, "current_bid_token": "WMT",
+      "last_updated": "2025-06-07T10:00:00Z", "number_of_bids": 4, "end_date": "2025-06-23T18:00:00Z",
+      "highest_bidder": "bidder_beta", "previous_highest_bidder": "bidder_alpha",
+      "completion_date": "2025-06-23T18:03:00Z", "number_of_agents": 2, "number_of_watchers": 11, "next_bid": "73500 WMT"
+    },
+    {
+      "h3_id": "8928308280fbfff", "resolution": 8, "country": "Austria", "country_alpha_3": "AUT", "country_alpha_2": "AT",
+      "geom": null, "lng": 14.31, "lat": 48.3, "h3_cell_area": 0.172, "status": "active", "name": "Linz East2",
+      "boundary_type": "interior", "bearing_angle": 90.0, "bearing_label": "E", "state_alpha_2": "AT", "state_fips": "07",
+      "pop_total_h5": 4800, "housing_total_h5": 2100, "housing_occupied_h5": 1950, "pop_density_h5": 28000,
+      "hex_estimated_value": 90000.0, "hex_starting_bid": 65000.0, "hex_current_bid": 75000.0, "current_bid_token": "WMT",
+      "last_updated": "2025-06-14T08:30:00Z", "number_of_bids": 5, "end_date": "2025-06-27T18:00:00Z",
+      "highest_bidder": "bidder_gamma", "previous_highest_bidder": "bidder_beta",
+      "completion_date": "2025-06-27T18:04:00Z", "number_of_agents": 2, "number_of_watchers": 13, "next_bid": "78750 WMT"
+    }
   ],
 
   "users": [
@@ -52,12 +160,60 @@
   ],
 
   "airnode_inventory": [
-    { "id": "inv-0001-0001-0001-0001", "created_at": "2025-01-10T00:00:00Z" },
-    { "id": "inv-0002-0002-0002-0002", "created_at": "2025-01-20T00:00:00Z" },
-    { "id": "inv-0003-0003-0003-0003", "created_at": "2025-02-01T00:00:00Z" },
-    { "id": "inv-0004-0004-0004-0004", "created_at": "2025-02-10T00:00:00Z" },
-    { "id": "inv-0005-0005-0005-0005", "created_at": "2025-02-20T00:00:00Z" },
-    { "id": "inv-0006-0006-0006-0006", "created_at": "2025-03-01T00:00:00Z" }
+    {
+      "id": "inv-0001-0001-0001-0001", "uuid": "WM-INV-0001", "model": "AN-100",
+      "payment_id": "pay-0001-aaaa-0001", "is_reserved": true,
+      "status_deposit_paid": "2025-01-15T00:00:00Z", "status_purchased": "2025-01-16T00:00:00Z",
+      "status_shipped": "2025-02-01T00:00:00Z", "status_delivered": "2025-02-10T00:00:00Z",
+      "status_waiting_on_deployment": "2025-02-12T00:00:00Z", "status_deployed": "2025-03-01T00:00:00Z",
+      "status_provisioning": "2025-03-05T00:00:00Z", "status_active": "2025-03-10T00:00:00Z",
+      "created_at": "2025-01-10T00:00:00Z"
+    },
+    {
+      "id": "inv-0002-0002-0002-0002", "uuid": "WM-INV-0002", "model": "AN-100",
+      "payment_id": "pay-0002-bbbb-0002", "is_reserved": false,
+      "status_deposit_paid": "2025-01-25T00:00:00Z", "status_purchased": "2025-01-26T00:00:00Z",
+      "status_shipped": "2025-02-05T00:00:00Z", "status_delivered": "2025-02-15T00:00:00Z",
+      "status_waiting_on_deployment": "2025-02-18T00:00:00Z", "status_deployed": "2025-03-05T00:00:00Z",
+      "status_provisioning": "2025-03-08T00:00:00Z", "status_active": "2025-03-12T00:00:00Z",
+      "created_at": "2025-01-20T00:00:00Z"
+    },
+    {
+      "id": "inv-0003-0003-0003-0003", "uuid": "WM-INV-0003", "model": "AN-200",
+      "payment_id": "pay-0003-cccc-0003", "is_reserved": true,
+      "status_deposit_paid": "2025-02-05T00:00:00Z", "status_purchased": "2025-02-06T00:00:00Z",
+      "status_shipped": "2025-02-20T00:00:00Z", "status_delivered": "2025-02-28T00:00:00Z",
+      "status_waiting_on_deployment": "2025-03-03T00:00:00Z", "status_deployed": "2025-03-18T00:00:00Z",
+      "status_provisioning": "2025-03-20T00:00:00Z", "status_active": "2025-03-25T00:00:00Z",
+      "created_at": "2025-02-01T00:00:00Z"
+    },
+    {
+      "id": "inv-0004-0004-0004-0004", "uuid": "WM-INV-0004", "model": "AN-200",
+      "payment_id": "pay-0004-dddd-0004", "is_reserved": false,
+      "status_deposit_paid": "2025-02-12T00:00:00Z", "status_purchased": "2025-02-13T00:00:00Z",
+      "status_shipped": "2025-02-25T00:00:00Z", "status_delivered": "2025-03-04T00:00:00Z",
+      "status_waiting_on_deployment": "2025-03-06T00:00:00Z", "status_deployed": "2025-03-22T00:00:00Z",
+      "status_provisioning": "2025-03-24T00:00:00Z", "status_active": "2025-03-28T00:00:00Z",
+      "created_at": "2025-02-10T00:00:00Z"
+    },
+    {
+      "id": "inv-0005-0005-0005-0005", "uuid": "WM-INV-0005", "model": "AN-300",
+      "payment_id": "pay-0005-eeee-0005", "is_reserved": true,
+      "status_deposit_paid": "2025-02-22T00:00:00Z", "status_purchased": "2025-02-23T00:00:00Z",
+      "status_shipped": "2025-03-05T00:00:00Z", "status_delivered": "2025-03-12T00:00:00Z",
+      "status_waiting_on_deployment": "2025-03-14T00:00:00Z", "status_deployed": "2025-03-30T00:00:00Z",
+      "status_provisioning": "2025-04-02T00:00:00Z", "status_active": "2025-04-06T00:00:00Z",
+      "created_at": "2025-02-20T00:00:00Z"
+    },
+    {
+      "id": "inv-0006-0006-0006-0006", "uuid": "WM-INV-0006", "model": "AN-300",
+      "payment_id": "pay-0006-ffff-0006", "is_reserved": false,
+      "status_deposit_paid": "2025-03-05T00:00:00Z", "status_purchased": "2025-03-06T00:00:00Z",
+      "status_shipped": "2025-03-18T00:00:00Z", "status_delivered": "2025-03-25T00:00:00Z",
+      "status_waiting_on_deployment": "2025-03-28T00:00:00Z", "status_deployed": "2025-04-10T00:00:00Z",
+      "status_provisioning": "2025-04-12T00:00:00Z", "status_active": "2025-04-15T00:00:00Z",
+      "created_at": "2025-03-01T00:00:00Z"
+    }
   ],
 
   "airnodes": [

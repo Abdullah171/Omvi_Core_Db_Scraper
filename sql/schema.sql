@@ -23,36 +23,50 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ===========================================================
--- Dimension: hexes (no deps)
+-- Dimension: hexes (complete)
 -- ===========================================================
 CREATE TABLE IF NOT EXISTS public.hexes (
-  h3_id               text PRIMARY KEY,
-  resolution          integer NOT NULL,
-  country             varchar(64),
-  country_alpha_3     varchar(8),
-  country_alpha_2     varchar(8),
-  geom                geometry(MultiPolygon, 4326),
-  lng                 double precision,
-  lat                 double precision,
-  h3_cell_area        double precision,
-  status              varchar(32),
-  name                varchar(256),
-  boundary_type       varchar(8),
-  bearing_angle       double precision,
-  bearing_label       varchar(8),
-  state_alpha_2       varchar(8),
-  state_fips          varchar(8),
-  pop_total_h5        double precision,
-  housing_total_h5    double precision,
-  housing_occupied_h5 double precision,
-  pop_density_h5      double precision,
-  hex_estimated_value double precision,
-  hex_starting_bid    double precision,
-  hex_current_bid     double precision,
-  current_bid_token   varchar(64)
+  h3_id                  text PRIMARY KEY,
+  resolution             integer NOT NULL,
+  country                varchar(64),
+  country_alpha_3        varchar(8),
+  country_alpha_2        varchar(8),
+  geom                   geometry(MultiPolygon, 4326),
+  lng                    double precision,
+  lat                    double precision,
+  h3_cell_area           double precision,
+  status                 varchar(32),
+  name                   varchar(256),
+  boundary_type          varchar(8),
+  bearing_angle          double precision,
+  bearing_label          varchar(8),
+  state_alpha_2          varchar(8),
+  state_fips             varchar(8),
+  pop_total_h5           double precision,
+  housing_total_h5       double precision,
+  housing_occupied_h5    double precision,
+  pop_density_h5         double precision,
+  hex_estimated_value    double precision,
+  hex_starting_bid       double precision,
+  hex_current_bid        double precision,
+  current_bid_token      varchar(64),
+  last_updated           timestamptz,
+  number_of_bids         integer,
+  end_date               timestamptz,
+  highest_bidder         varchar(64),
+  previous_highest_bidder varchar(64),
+  completion_date        timestamptz,
+  number_of_agents       integer,
+  number_of_watchers     integer,
+  next_bid               varchar(64)
 );
-CREATE INDEX IF NOT EXISTS idx_hexes_resolution ON public.hexes (resolution);
-CREATE INDEX IF NOT EXISTS idx_hexes_geom_gix   ON public.hexes USING GIST (geom);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_hexes_resolution      ON public.hexes (resolution);
+CREATE INDEX IF NOT EXISTS idx_hexes_geom_gix        ON public.hexes USING GIST (geom);
+CREATE INDEX IF NOT EXISTS idx_hexes_country_city    ON public.hexes (country, country_alpha_2);
+CREATE INDEX IF NOT EXISTS idx_hexes_status          ON public.hexes (status);
+
 
 -- ===========================================================
 -- Dimension: users (no deps)
@@ -178,19 +192,6 @@ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
-CREATE TABLE IF NOT EXISTS public.airnode_inventory (
-  id          uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  -- add model/phase fields later as needed
-  created_at  timestamptz NOT NULL DEFAULT now(),
-  updated_at  timestamptz NOT NULL DEFAULT now()
-);
-DO $$
-BEGIN
-  CREATE TRIGGER trg_airnode_inventory_updated_at
-  BEFORE UPDATE ON public.airnode_inventory
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
 
 -- ===========================================================
 -- Dimension: host_locations (deps: users, airnodes, hexes, addresses)
@@ -234,6 +235,77 @@ CREATE INDEX IF NOT EXISTS idx_host_locations_user   ON public.host_locations(us
 CREATE INDEX IF NOT EXISTS idx_host_locations_airnode ON public.host_locations(airnode_id);
 CREATE INDEX IF NOT EXISTS idx_host_locations_hex    ON public.host_locations(hex_id);
 CREATE INDEX IF NOT EXISTS idx_host_locations_geom   ON public.host_locations USING GIST (geom);
+
+
+-- ===========================================================
+-- Fact: payments (deps: addresses, users)
+-- ===========================================================
+CREATE TABLE IF NOT EXISTS public.payments (
+  id                                uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  provider                          varchar(255),
+  provider_id                       varchar(255),
+  address_id                        uuid REFERENCES public.addresses(id) ON DELETE SET NULL,
+  currency                          varchar(255),
+  total                             bigint CHECK (total >= 0),
+  paid                              bigint CHECK (paid  >= 0),
+  user_id                           uuid REFERENCES public.users(id)     ON DELETE SET NULL,
+  is_expired                        boolean,
+  bank_transfer_url                 text,
+  bank_transfer_payment_intent_id   text,
+  bank_transfer_checkout_session_id text,
+  jira_order_id                     text,
+  freshdesk_id                      text,
+  node_ids                          text,
+  created_at                        timestamptz NOT NULL DEFAULT now(),
+  updated_at                        timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT chk_paid_le_total CHECK (paid <= total)
+);
+DO $$
+BEGIN
+  CREATE TRIGGER trg_payments_updated_at
+  BEFORE UPDATE ON public.payments
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+CREATE INDEX IF NOT EXISTS idx_payments_user       ON public.payments(user_id);
+CREATE INDEX IF NOT EXISTS idx_payments_created_at ON public.payments(created_at);
+CREATE INDEX IF NOT EXISTS idx_payments_provider   ON public.payments(provider, provider_id);
+
+-- ===========================================================
+-- Dimension: airnode_inventory 
+-- ===========================================================
+CREATE TABLE IF NOT EXISTS public.airnode_inventory (
+  id                            uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  uuid                          varchar(255),  -- from screenshot (string(255))
+  model                         varchar(255),
+  payment_id                    uuid REFERENCES public.payments(id) ON DELETE SET NULL,
+  is_reserved                   boolean,
+  status_deposit_paid           timestamptz(6),
+  status_purchased              timestamptz(6),
+  status_shipped                timestamptz(6),
+  status_delivered              timestamptz(6),
+  status_waiting_on_deployment  timestamptz(6),
+  status_deployed               timestamptz(6),
+  status_provisioning           timestamptz(6),
+  status_active                 timestamptz(6),
+  created_at                    timestamptz NOT NULL DEFAULT now(),
+  updated_at                    timestamptz NOT NULL DEFAULT now()
+);
+
+-- Trigger to auto-update `updated_at`
+DO $$
+BEGIN
+  CREATE TRIGGER trg_airnode_inventory_updated_at
+  BEFORE UPDATE ON public.airnode_inventory
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+-- Optional helpful index
+CREATE INDEX IF NOT EXISTS idx_airnode_inventory_payment_id
+  ON public.airnode_inventory(payment_id);
+
+
 
 -- ===========================================================
 -- Dimension: threads (deps: host_locations, users)
@@ -282,39 +354,6 @@ END $$;
 CREATE INDEX IF NOT EXISTS idx_hlom_host_location ON public.host_location_operator_map(host_location_id);
 CREATE INDEX IF NOT EXISTS idx_hlom_operator      ON public.host_location_operator_map(operator_id);
 
--- ===========================================================
--- Fact: payments (deps: addresses, users)
--- ===========================================================
-CREATE TABLE IF NOT EXISTS public.payments (
-  id                                uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  provider                          varchar(255),
-  provider_id                       varchar(255),
-  address_id                        uuid REFERENCES public.addresses(id) ON DELETE SET NULL,
-  currency                          varchar(255),
-  total                             bigint CHECK (total >= 0),
-  paid                              bigint CHECK (paid  >= 0),
-  user_id                           uuid REFERENCES public.users(id)     ON DELETE SET NULL,
-  is_expired                        boolean,
-  bank_transfer_url                 text,
-  bank_transfer_payment_intent_id   text,
-  bank_transfer_checkout_session_id text,
-  jira_order_id                     text,
-  freshdesk_id                      text,
-  node_ids                          text,
-  created_at                        timestamptz NOT NULL DEFAULT now(),
-  updated_at                        timestamptz NOT NULL DEFAULT now(),
-  CONSTRAINT chk_paid_le_total CHECK (paid <= total)
-);
-DO $$
-BEGIN
-  CREATE TRIGGER trg_payments_updated_at
-  BEFORE UPDATE ON public.payments
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
-CREATE INDEX IF NOT EXISTS idx_payments_user       ON public.payments(user_id);
-CREATE INDEX IF NOT EXISTS idx_payments_created_at ON public.payments(created_at);
-CREATE INDEX IF NOT EXISTS idx_payments_provider   ON public.payments(provider, provider_id);
 
 -- ===========================================================
 -- Dimension: accounts (deps: users)
@@ -385,6 +424,8 @@ BEGIN
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
+
+
 
 -- ===========================================================
 -- cdr.earnings (deps: airnodes, affiliate.users)
