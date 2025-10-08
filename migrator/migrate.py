@@ -3,11 +3,13 @@ import sys
 import time
 import psycopg
 
+
 DB_HOST = os.getenv("DB_HOST", "db")
 DB_PORT = int(os.getenv("DB_PORT", "5432"))
 DB_NAME = os.getenv("DB_NAME", "postgres")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
+
 
 def wait_for_db(max_seconds=120):
     start = time.time()
@@ -49,10 +51,13 @@ def run_sql_file(path):
     print("✅ Schema applied successfully")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python migrate.py /path/to/schema.sql")
-        sys.exit(1)
 
-    sql_path = sys.argv[1]
+
+    sql_path = "schema.sql"
+    # if len(sys.argv) < 2:
+    #     print("Usage: python migrate.py /path/to/schema.sql")
+    #     sys.exit(1)
+
+    # sql_path = sys.argv[1]
     wait_for_db()
     run_sql_file(sql_path)

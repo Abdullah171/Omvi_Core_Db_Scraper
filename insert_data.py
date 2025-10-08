@@ -27,6 +27,7 @@ DEFAULTS = {
     "DB_PASSWORD": os.getenv("DB_PASSWORD", "galaxy"),
 }
 
+
 # Helper: split "schema.table" into (schema, table)
 def _split_table(qualified: str) -> Tuple[str, str]:
     if "." in qualified:
@@ -78,7 +79,6 @@ def insert_rows(conn, qualified_table: str, cols: List[str], rows: List[Dict[str
         t = (col_types.get(col) or '').lower()
         if val is None:
             return None
-
         if t in ('json', 'jsonb'):
             if isinstance(val, (dict, list, int, float, bool)):
                 return Json(val)
@@ -88,7 +88,6 @@ def insert_rows(conn, qualified_table: str, cols: List[str], rows: List[Dict[str
                 except Exception:
                     return Json(val)
             return Json(val)
-
         if t == 'uuid':
             if isinstance(val, uuid.UUID):
                 return str(val)
@@ -98,19 +97,14 @@ def insert_rows(conn, qualified_table: str, cols: List[str], rows: List[Dict[str
                 except Exception:
                     return str(uuid.uuid5(UUID_NS, val))
             return str(uuid.uuid5(UUID_NS, str(val)))
-
-        if t == 'geometry':
-            if isinstance(val, str):
-                s = val.strip()
-                if s.startswith('{'):
-                    return s
-                else:
-                    if not s.upper().startswith('SRID='):
-                        s = f"SRID=4326;{s}"
-                    return s
-            return val
-
+        # geometry branch removed
+        if t in ('double precision', 'numeric', 'real'):
+            try:
+                return float(val)
+            except Exception:
+                return None
         return val
+
 
     with conn.cursor() as cur:
         for r in rows:
@@ -141,16 +135,16 @@ def main():
             # Seed order:
             # 1) hexes
             insert_rows(conn, "public.hexes", [
-                "h3_id","resolution","country","country_alpha_3","country_alpha_2",
-                "geom","lng","lat","h3_cell_area","status","name","boundary_type",
-                "bearing_angle","bearing_label","state_alpha_2","state_fips",
-                "pop_total_h5","housing_total_h5","housing_occupied_h5","pop_density_h5",
-                "hex_estimated_value","hex_starting_bid","hex_current_bid","current_bid_token",
-                # NEW FIELDS
-                "last_updated","number_of_bids","end_date","highest_bidder",
-                "previous_highest_bidder","completion_date","number_of_agents",
-                "number_of_watchers","next_bid"
-            ], data.get("hexes", []))
+            "h3_id","resolution","country","country_alpha_3","country_alpha_2",
+            # "geom",  <-- removed
+            "lng","lat","h3_cell_area","status","name","boundary_type",
+            "bearing_angle","bearing_label","state_alpha_2","state_fips",
+            "pop_total_h5","housing_total_h5","housing_occupied_h5","pop_density_h5",
+            "hex_estimated_value","hex_starting_bid","hex_current_bid","current_bid_token",
+            "last_updated","number_of_bids","end_date","highest_bidder",
+            "previous_highest_bidder","completion_date","number_of_agents",
+            "number_of_watchers","next_bid"
+        ], data.get("hexes", []))
 
             # 2) users, affiliate.users
             insert_rows(conn, "public.users", [
@@ -172,9 +166,12 @@ def main():
 
             # 4) nodehost
             insert_rows(conn, "public.nodehost", [
-                "id","h3_id","host_name","host_email","agent_name","agent_email","building_id",
-                "building_address","building_height_m","building_type","geom","building_floor_count"
-            ], data.get("nodehost", []))
+            "id","h3_id","host_name","host_email","agent_name","agent_email","building_id",
+            "building_address","building_height_m","building_type",
+            "lat","lng",  # replaced geom
+            "building_floor_count"
+        ], data.get("nodehost", []))
+
 
             # 5) sites
             insert_rows(conn, "public.sites", [
@@ -193,10 +190,13 @@ def main():
 
             # 8) host_locations
             insert_rows(conn, "public.host_locations", [
-                "id","user_id","airnode_id","height","power_supply","hex_id","approved","listed",
-                "longitude","latitude","zipcode","phone","property_phone","address_id",
-                "equipment","instructions","created_at"
-            ], data.get("host_locations", []))
+            "id","user_id","airnode_id","height","power_supply","hex_id","approved","listed",
+            "longitude","latitude","zipcode","phone","property_phone","address_id",
+            "equipment","instructions",
+            # "geom",  <-- removed
+            "created_at"
+        ], data.get("host_locations", []))
+
 
             # 9) threads
             insert_rows(conn, "public.threads", [

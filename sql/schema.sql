@@ -4,7 +4,6 @@
 -- ===========================================================
 
 -- ---------- Extensions ----------
-CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS citext;
 -- CREATE EXTENSION IF NOT EXISTS vector; -- enable later if/when you add embeddings
@@ -22,51 +21,72 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- ===========================================================
--- Dimension: hexes (complete)
--- ===========================================================
+-- =========================
+-- Dimension: hexes (no PostGIS)
+-- =========================
 CREATE TABLE IF NOT EXISTS public.hexes (
-  h3_id                  text PRIMARY KEY,
-  resolution             integer NOT NULL,
-  country                varchar(64),
-  country_alpha_3        varchar(8),
-  country_alpha_2        varchar(8),
-  geom                   geometry(MultiPolygon, 4326),
-  lng                    double precision,
-  lat                    double precision,
-  h3_cell_area           double precision,
-  status                 varchar(32),
-  name                   varchar(256),
-  boundary_type          varchar(8),
-  bearing_angle          double precision,
-  bearing_label          varchar(8),
-  state_alpha_2          varchar(8),
-  state_fips             varchar(8),
-  pop_total_h5           double precision,
-  housing_total_h5       double precision,
-  housing_occupied_h5    double precision,
-  pop_density_h5         double precision,
-  hex_estimated_value    double precision,
-  hex_starting_bid       double precision,
-  hex_current_bid        double precision,
-  current_bid_token      varchar(64),
-  last_updated           timestamptz,
-  number_of_bids         integer,
-  end_date               timestamptz,
-  highest_bidder         varchar(64),
+  h3_id                   text PRIMARY KEY,
+  resolution              integer NOT NULL,
+  country                 varchar(64),
+  country_alpha_3         varchar(8),
+  country_alpha_2         varchar(8),
+  -- geom removed
+  lng                     double precision,
+  lat                     double precision,
+  h3_cell_area            double precision,
+  status                  varchar(32),
+  name                    varchar(256),
+  boundary_type           varchar(8),
+  bearing_angle           double precision,
+  bearing_label           varchar(8),
+  state_alpha_2           varchar(8),
+  state_fips              varchar(8),
+  pop_total_h5            double precision,
+  housing_total_h5        double precision,
+  housing_occupied_h5     double precision,
+  pop_density_h5          double precision,
+  hex_estimated_value     double precision,
+  hex_starting_bid        double precision,
+  hex_current_bid         double precision,
+  current_bid_token       varchar(64),
+  last_updated            timestamptz,
+  number_of_bids          integer,
+  end_date                timestamptz,
+  highest_bidder          varchar(64),
   previous_highest_bidder varchar(64),
-  completion_date        timestamptz,
-  number_of_agents       integer,
-  number_of_watchers     integer,
-  next_bid               varchar(64)
+  completion_date         timestamptz,
+  number_of_agents        integer,
+  number_of_watchers      integer,
+  next_bid                varchar(64)
 );
 
--- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_hexes_resolution      ON public.hexes (resolution);
-CREATE INDEX IF NOT EXISTS idx_hexes_geom_gix        ON public.hexes USING GIST (geom);
-CREATE INDEX IF NOT EXISTS idx_hexes_country_city    ON public.hexes (country, country_alpha_2);
-CREATE INDEX IF NOT EXISTS idx_hexes_status          ON public.hexes (status);
+CREATE INDEX IF NOT EXISTS idx_hexes_resolution   ON public.hexes (resolution);
+-- dropped: idx_hexes_geom_gix
+CREATE INDEX IF NOT EXISTS idx_hexes_country_city ON public.hexes (country, country_alpha_2);
+CREATE INDEX IF NOT EXISTS idx_hexes_status       ON public.hexes (status);
 
+-- =========================
+-- Dimension: nodehost (no PostGIS) — #1 occurrence
+-- =========================
+CREATE TABLE IF NOT EXISTS public.nodehost (
+  id                    bigserial PRIMARY KEY,
+  h3_id                 text REFERENCES public.hexes(h3_id) ON DELETE SET NULL,
+  host_name             text,
+  host_email            text,
+  agent_name            text,
+  agent_email           text,
+  building_id           integer,
+  building_address      text,
+  building_height_m     double precision,
+  building_type         varchar(64),
+  -- geom replaced with lat/lng
+  lat                   double precision,
+  lng                   double precision,
+  building_floor_count  integer
+);
+
+CREATE INDEX IF NOT EXISTS idx_nodehost_h3_id ON public.nodehost(h3_id);
+-- dropped: idx_nodehost_geom_gix
 
 -- ===========================================================
 -- Dimension: users (no deps)
@@ -94,70 +114,29 @@ EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
 -- ===========================================================
--- Dimension: airnodes (no deps)
+-- affiliate.users (no external deps)
 -- ===========================================================
-CREATE TABLE IF NOT EXISTS public.airnodes (
-  id                       text PRIMARY KEY,
-  type                     integer,              -- from uint
-  purchase_status          integer,              -- from uint
-  -- Source spec contains a typo; keep both for safety when ingesting:
-  initial_puchase_status   integer,              -- typo kept for ingest
-  initial_purchase_status  integer,              -- normalized name for future use
-  provisioning_status      integer,              -- from uint
-  host_id                  text,
-  operator_id              text,
-  hardware_cells_ids       jsonb,
-  updated_at               timestamptz,
-  parent_id                text,
-  version                  integer,
-  name                     text,
-  batch_name               text,
-  created_at               timestamptz DEFAULT now(),
-  deleted_at               timestamptz
+CREATE TABLE IF NOT EXISTS affiliate.users (
+  id                uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name              varchar(255),
+  email             citext UNIQUE,
+  username          citext,
+  role              varchar(255),
+  is_partner        boolean,
+  email_verified    boolean,
+  image             varchar(255),
+  display_username  varchar(255),
+  billing_address   varchar(255),
+  created_at        timestamptz NOT NULL DEFAULT now(),
+  updated_at        timestamptz NOT NULL DEFAULT now()
 );
-
--- ===========================================================
--- Dimension: nodehost (deps: hexes)
--- ===========================================================
-CREATE TABLE IF NOT EXISTS public.nodehost (
-  id                    bigserial PRIMARY KEY,
-  h3_id                 text REFERENCES public.hexes(h3_id) ON DELETE SET NULL,
-  host_name             text,
-  host_email            text,
-  agent_name            text,
-  agent_email           text,
-  building_id           integer,        -- placeholder until buildings dim exists
-  building_address      text,
-  building_height_m     double precision,
-  building_type         varchar(64),
-  geom                  geometry(Point, 4326),
-  building_floor_count  integer
-);
-CREATE INDEX IF NOT EXISTS idx_nodehost_h3_id    ON public.nodehost(h3_id);
-CREATE INDEX IF NOT EXISTS idx_nodehost_geom_gix ON public.nodehost USING GIST (geom);
-
--- ===========================================================
--- Dimension: sites (no deps) + bridge (deps: airnodes)
--- ===========================================================
-CREATE TABLE IF NOT EXISTS public.sites (
-  id          text PRIMARY KEY,
-  name        text,
-  latitude    double precision,
-  longitude   double precision,
-  country     text,
-  city        text,
-  state       text,
-  hexes       jsonb,
-  apex_lat    double precision,
-  apex_lng    double precision
-);
-CREATE INDEX IF NOT EXISTS idx_sites_country_city ON public.sites(country, city);
-
-CREATE TABLE IF NOT EXISTS public.sites_with_airnodes (
-  site_id     text REFERENCES public.sites(id)    ON DELETE CASCADE,
-  airnode_id  text REFERENCES public.airnodes(id) ON DELETE CASCADE,
-  PRIMARY KEY (site_id, airnode_id)
-);
+DO $$
+BEGIN
+  CREATE TRIGGER trg_affiliate_users_updated_at
+  BEFORE UPDATE ON affiliate.users
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ===========================================================
 -- Support/Lookup dimensions (no external deps)
@@ -191,51 +170,6 @@ BEGIN
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
-
-
--- ===========================================================
--- Dimension: host_locations (deps: users, airnodes, hexes, addresses)
--- ===========================================================
-CREATE TABLE IF NOT EXISTS public.host_locations (
-  id                uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id           uuid REFERENCES public.users(id)        ON DELETE SET NULL,
-  airnode_id        text REFERENCES public.airnodes(id)     ON DELETE SET NULL,
-  height            varchar(255),
-  power_supply      varchar(255),
-  hex_id            text REFERENCES public.hexes(h3_id)     ON DELETE SET NULL,
-  approved          boolean,
-  listed            boolean,
-  longitude         double precision,
-  latitude          double precision,
-  zipcode           varchar(255),
-  phone             varchar(255),
-  property_phone    varchar(255),
-  address_id        uuid REFERENCES public.addresses(id)    ON DELETE SET NULL,
-  equipment         varchar(255),
-  instructions      varchar(255),
-  geom              geometry(Point, 4326)
-    GENERATED ALWAYS AS (
-      CASE
-        WHEN longitude IS NOT NULL AND latitude IS NOT NULL
-        THEN ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)
-        ELSE NULL
-      END
-    ) STORED,
-  created_at        timestamptz NOT NULL DEFAULT now(),
-  updated_at        timestamptz NOT NULL DEFAULT now()
-);
-DO $$
-BEGIN
-  CREATE TRIGGER trg_host_locations_updated_at
-  BEFORE UPDATE ON public.host_locations
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
-CREATE INDEX IF NOT EXISTS idx_host_locations_user   ON public.host_locations(user_id);
-CREATE INDEX IF NOT EXISTS idx_host_locations_airnode ON public.host_locations(airnode_id);
-CREATE INDEX IF NOT EXISTS idx_host_locations_hex    ON public.host_locations(hex_id);
-CREATE INDEX IF NOT EXISTS idx_host_locations_geom   ON public.host_locations USING GIST (geom);
-
 
 -- ===========================================================
 -- Fact: payments (deps: addresses, users)
@@ -272,40 +206,88 @@ CREATE INDEX IF NOT EXISTS idx_payments_created_at ON public.payments(created_at
 CREATE INDEX IF NOT EXISTS idx_payments_provider   ON public.payments(provider, provider_id);
 
 -- ===========================================================
--- Dimension: airnode_inventory 
+-- Dimension: airnodes (no deps)
 -- ===========================================================
-CREATE TABLE IF NOT EXISTS public.airnode_inventory (
-  id                            uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  uuid                          varchar(255),  -- from screenshot (string(255))
-  model                         varchar(255),
-  payment_id                    uuid REFERENCES public.payments(id) ON DELETE SET NULL,
-  is_reserved                   boolean,
-  status_deposit_paid           timestamptz(6),
-  status_purchased              timestamptz(6),
-  status_shipped                timestamptz(6),
-  status_delivered              timestamptz(6),
-  status_waiting_on_deployment  timestamptz(6),
-  status_deployed               timestamptz(6),
-  status_provisioning           timestamptz(6),
-  status_active                 timestamptz(6),
-  created_at                    timestamptz NOT NULL DEFAULT now(),
-  updated_at                    timestamptz NOT NULL DEFAULT now()
+CREATE TABLE IF NOT EXISTS public.airnodes (
+  id                       text PRIMARY KEY,
+  type                     integer,              -- from uint
+  purchase_status          integer,              -- from uint
+  -- Source spec contains a typo; keep both for safety when ingesting:
+  initial_puchase_status   integer,              -- typo kept for ingest
+  initial_purchase_status  integer,              -- normalized name for future use
+  provisioning_status      integer,              -- from uint
+  host_id                  text,
+  operator_id              text,
+  hardware_cells_ids       jsonb,
+  updated_at               timestamptz,
+  parent_id                text,
+  version                  integer,
+  name                     text,
+  batch_name               text,
+  created_at               timestamptz DEFAULT now(),
+  deleted_at               timestamptz
 );
 
--- Trigger to auto-update `updated_at`
+-- ===========================================================
+-- Dimension: sites (no deps) + bridge (deps: airnodes)
+-- ===========================================================
+CREATE TABLE IF NOT EXISTS public.sites (
+  id          text PRIMARY KEY,
+  name        text,
+  latitude    double precision,
+  longitude   double precision,
+  country     text,
+  city        text,
+  state       text,
+  hexes       jsonb,
+  apex_lat    double precision,
+  apex_lng    double precision
+);
+CREATE INDEX IF NOT EXISTS idx_sites_country_city ON public.sites(country, city);
+
+CREATE TABLE IF NOT EXISTS public.sites_with_airnodes (
+  site_id     text REFERENCES public.sites(id)    ON DELETE CASCADE,
+  airnode_id  text REFERENCES public.airnodes(id) ON DELETE CASCADE,
+  PRIMARY KEY (site_id, airnode_id)
+);
+
+-- =========================
+-- Dimension: host_locations (deps: users, airnodes, hexes, addresses)
+-- =========================
+CREATE TABLE IF NOT EXISTS public.host_locations (
+  id                uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id           uuid REFERENCES public.users(id)        ON DELETE SET NULL,
+  airnode_id        text REFERENCES public.airnodes(id)     ON DELETE SET NULL,
+  height            varchar(255),
+  power_supply      varchar(255),
+  hex_id            text REFERENCES public.hexes(h3_id)     ON DELETE SET NULL,
+  approved          boolean,
+  listed            boolean,
+  longitude         double precision,
+  latitude          double precision,
+  zipcode           varchar(255),
+  phone             varchar(255),
+  property_phone    varchar(255),
+  address_id        uuid REFERENCES public.addresses(id)    ON DELETE SET NULL,
+  equipment         varchar(255),
+  instructions      varchar(255),
+  -- geom computed column removed
+  created_at        timestamptz NOT NULL DEFAULT now(),
+  updated_at        timestamptz NOT NULL DEFAULT now()
+);
+
 DO $$
 BEGIN
-  CREATE TRIGGER trg_airnode_inventory_updated_at
-  BEFORE UPDATE ON public.airnode_inventory
+  CREATE TRIGGER trg_host_locations_updated_at
+  BEFORE UPDATE ON public.host_locations
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
--- Optional helpful index
-CREATE INDEX IF NOT EXISTS idx_airnode_inventory_payment_id
-  ON public.airnode_inventory(payment_id);
-
-
+CREATE INDEX IF NOT EXISTS idx_host_locations_user    ON public.host_locations(user_id);
+CREATE INDEX IF NOT EXISTS idx_host_locations_airnode ON public.host_locations(airnode_id);
+CREATE INDEX IF NOT EXISTS idx_host_locations_hex     ON public.host_locations(hex_id);
+-- dropped: idx_host_locations_geom
 
 -- ===========================================================
 -- Dimension: threads (deps: host_locations, users)
@@ -326,6 +308,38 @@ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 CREATE INDEX IF NOT EXISTS idx_threads_hl ON public.threads(host_location_id);
+
+-- ===========================================================
+-- Dimension: airnode_inventory (deps: payments)
+-- ===========================================================
+CREATE TABLE IF NOT EXISTS public.airnode_inventory (
+  id                            uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  uuid                          varchar(255),  -- from screenshot (string(255))
+  model                         varchar(255),
+  payment_id                    uuid REFERENCES public.payments(id) ON DELETE SET NULL,
+  is_reserved                   boolean,
+  status_deposit_paid           timestamptz(6),
+  status_purchased              timestamptz(6),
+  status_shipped                timestamptz(6),
+  status_delivered              timestamptz(6),
+  status_waiting_on_deployment  timestamptz(6),
+  status_deployed               timestamptz(6),
+  status_provisioning           timestamptz(6),
+  status_active                 timestamptz(6),
+  created_at                    timestamptz NOT NULL DEFAULT now(),
+  updated_at                    timestamptz NOT NULL DEFAULT now()
+);
+
+DO $$
+BEGIN
+  CREATE TRIGGER trg_airnode_inventory_updated_at
+  BEFORE UPDATE ON public.airnode_inventory
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+CREATE INDEX IF NOT EXISTS idx_airnode_inventory_payment_id
+  ON public.airnode_inventory(payment_id);
 
 -- ===========================================================
 -- Bridge: host_location_operator_map
@@ -353,7 +367,6 @@ EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 CREATE INDEX IF NOT EXISTS idx_hlom_host_location ON public.host_location_operator_map(host_location_id);
 CREATE INDEX IF NOT EXISTS idx_hlom_operator      ON public.host_location_operator_map(operator_id);
-
 
 -- ===========================================================
 -- Dimension: accounts (deps: users)
@@ -401,33 +414,6 @@ CREATE INDEX IF NOT EXISTS idx_admin_actions_user       ON public.admin_actions(
 CREATE INDEX IF NOT EXISTS idx_admin_actions_created_at ON public.admin_actions(created_at);
 
 -- ===========================================================
--- affiliate.users (no external deps)
--- ===========================================================
-CREATE TABLE IF NOT EXISTS affiliate.users (
-  id                uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name              varchar(255),
-  email             citext UNIQUE,
-  username          citext,
-  role              varchar(255),
-  is_partner        boolean,
-  email_verified    boolean,
-  image             varchar(255),
-  display_username  varchar(255),
-  billing_address   varchar(255),
-  created_at        timestamptz NOT NULL DEFAULT now(),
-  updated_at        timestamptz NOT NULL DEFAULT now()
-);
-DO $$
-BEGIN
-  CREATE TRIGGER trg_affiliate_users_updated_at
-  BEFORE UPDATE ON affiliate.users
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
-
-
-
--- ===========================================================
 -- cdr.earnings (deps: airnodes, affiliate.users)
 -- ===========================================================
 CREATE TABLE IF NOT EXISTS cdr.earnings (
@@ -457,6 +443,29 @@ CREATE TABLE IF NOT EXISTS cart.user_linked_affiliates (
   PRIMARY KEY (user_id, affiliate_code)
 );
 CREATE INDEX IF NOT EXISTS idx_ula_created_at ON cart.user_linked_affiliates(created_at);
+
+-- =========================
+-- Dimension: nodehost (no PostGIS) — #2 occurrence (left intact)
+-- =========================
+CREATE TABLE IF NOT EXISTS public.nodehost (
+  id                    bigserial PRIMARY KEY,
+  h3_id                 text REFERENCES public.hexes(h3_id) ON DELETE SET NULL,
+  host_name             text,
+  host_email            text,
+  agent_name            text,
+  agent_email           text,
+  building_id           integer,
+  building_address      text,
+  building_height_m     double precision,
+  building_type         varchar(64),
+  -- geom replaced with lat/lng
+  lat                   double precision,
+  lng                   double precision,
+  building_floor_count  integer
+);
+
+CREATE INDEX IF NOT EXISTS idx_nodehost_h3_id ON public.nodehost(h3_id);
+-- dropped: idx_nodehost_geom_gix
 
 -- ===========================================================
 -- Helpful views (deps: hexes, host_locations)
