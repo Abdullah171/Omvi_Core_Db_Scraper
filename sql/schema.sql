@@ -6,12 +6,29 @@
 -- ---------- Extensions ----------
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS citext;
+CREATE SCHEMA IF NOT EXISTS dcc;  -- to host the alternate "users" from CSV
+
 -- CREATE EXTENSION IF NOT EXISTS vector; -- enable later if/when you add embeddings
 
 -- ---------- Schemas ----------
 CREATE SCHEMA IF NOT EXISTS affiliate;
 CREATE SCHEMA IF NOT EXISTS cdr;
 CREATE SCHEMA IF NOT EXISTS cart;
+
+-- ---------- Custom types needed early ----------
+DO $$
+BEGIN
+  -- create public.discount_type_enum if it doesn't exist (users.discount_type depends on it)
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type t
+    JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE t.typname = 'discount_type_enum' AND n.nspname = 'public'
+  ) THEN
+    CREATE TYPE public.discount_type_enum AS ENUM ('percentage','fixed','tier','other');
+  END IF;
+END $$;
+
+
 
 -- ---------- Utility: updated_at trigger ----------
 CREATE OR REPLACE FUNCTION set_updated_at() RETURNS trigger AS $$
@@ -511,23 +528,6 @@ LEFT JOIN public.host_locations hl ON hl.hex_id = h.h3_id
 GROUP BY h.h3_id;
 
 
-CREATE SCHEMA IF NOT EXISTS dcc;  -- to host the alternate "users" from CSV
-
--- ---------- Helper to guard trigger creation ----------
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_proc WHERE proname = 'set_updated_at'
-  ) THEN
-    CREATE OR REPLACE FUNCTION set_updated_at() RETURNS trigger AS $$
-    BEGIN
-      NEW.updated_at = now();
-      RETURN NEW;
-    END;
-    $$ LANGUAGE plpgsql;
-  END IF;
-END $$;
-
 -- ===========================================================
 -- Engagement / Interest
 -- ===========================================================
@@ -734,6 +734,7 @@ CREATE TABLE IF NOT EXISTS public.discount_infos (
   created_at    timestamptz,
   updated_at    timestamptz
 );
+
 
 -- Keep CSV's misspelling to preserve source
 CREATE TYPE public.discount_type AS ENUM ('percentage','fixed','tier','other');
@@ -1536,7 +1537,7 @@ CREATE INDEX IF NOT EXISTS idx_fact1_hex ON public.fact_core_1(hexes_h3_id);
 CREATE INDEX IF NOT EXISTS idx_fact1_user ON public.fact_core_1(users_id);
 
 -- -------------------------
--- Fact table 2 (CSV row 45)
+-- Fact table 2 (CSV row 45) — fixed FKs
 -- -------------------------
 CREATE TABLE IF NOT EXISTS public.fact_core_2 (
   -- hex / nodehost (again)
@@ -1566,7 +1567,7 @@ CREATE TABLE IF NOT EXISTS public.fact_core_2 (
   sparkagg_id               varchar REFERENCES public.sparkagg(id) ON DELETE SET NULL,
 
   -- airnode cell map (CSV typo "airnodecellimap")
-  airnodecellidmap_airnode_id       text REFERENCES public.airnodecellidmap(airnode_id) ON DELETE SET NULL,
+  airnodecellidmap_airnode_id       text,
   airnodecellidmap_host_user_id     uuid,
   airnodecellidmap_operator_user_id uuid,
 
@@ -1577,7 +1578,7 @@ CREATE TABLE IF NOT EXISTS public.fact_core_2 (
 
   wmnumbers_id              bigint REFERENCES public.wmnumbers(id) ON DELETE SET NULL,
 
-  -- DCC users (CSV had a separate users table for DCC)
+  -- DCC users
   dcc_users_id              varchar REFERENCES dcc.users(id) ON DELETE SET NULL,
 
   lpas_id                   bigint REFERENCES public.lpas(id) ON DELETE SET NULL,
@@ -1596,7 +1597,11 @@ CREATE TABLE IF NOT EXISTS public.fact_core_2 (
   -- commerce
   orders_id                 bigint REFERENCES public.orders(id) ON DELETE SET NULL,
   items_id                  bigint REFERENCES public.items(id) ON DELETE SET NULL,
-  user_linked_affiliates_user_id uuid REFERENCES cart.user_linked_affiliates(user_id) ON DELETE SET NULL,
+
+  -- composite ref to cart.user_linked_affiliates(user_id, affiliate_code)
+  user_linked_affiliates_user_id    uuid,
+  user_linked_affiliates_affiliate_code text,
+
   prices_id                 bigint REFERENCES public.prices(id) ON DELETE SET NULL,
   discount_infos_id         bigint REFERENCES public.discount_infos(id) ON DELETE SET NULL,
   expired_items_id          bigint REFERENCES public.expired_items(id) ON DELETE SET NULL,
@@ -1609,8 +1614,23 @@ CREATE TABLE IF NOT EXISTS public.fact_core_2 (
   coinbases_id              bigint REFERENCES public.coinbases(id) ON DELETE SET NULL,
   stripe_fulls_id           bigint REFERENCES public.stripe_fulls(id) ON DELETE SET NULL,
   crypto_coms_id            bigint REFERENCES public.crypto_coms(id) ON DELETE SET NULL,
-  stripe_banks_id           bigint REFERENCES public.stripe_banks(id) ON DELETE SET NULL
+  stripe_banks_id           bigint REFERENCES public.stripe_banks(id) ON DELETE SET NULL,
+
+  -- ✅ Correct composite FK to airnodecellidmap
+  CONSTRAINT fk_fact2_airnodecellidmap
+    FOREIGN KEY (airnodecellidmap_airnode_id,
+                 airnodecellidmap_host_user_id,
+                 airnodecellidmap_operator_user_id)
+    REFERENCES public.airnodecellidmap(airnode_id, host_user_id, operator_user_id)
+    ON DELETE SET NULL,
+
+  -- ✅ Correct composite FK to cart.user_linked_affiliates
+  CONSTRAINT fk_fact2_ula
+    FOREIGN KEY (user_linked_affiliates_user_id, user_linked_affiliates_affiliate_code)
+    REFERENCES cart.user_linked_affiliates(user_id, affiliate_code)
+    ON DELETE SET NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_fact2_hex ON public.fact_core_2(hexes_h3_id);
+-- Helpful indexes
+CREATE INDEX IF NOT EXISTS idx_fact2_hex    ON public.fact_core_2(hexes_h3_id);
 CREATE INDEX IF NOT EXISTS idx_fact2_orders ON public.fact_core_2(orders_id);

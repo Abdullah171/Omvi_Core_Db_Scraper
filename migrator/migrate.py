@@ -54,11 +54,11 @@ def run_sql_file(path):
 if __name__ == "__main__":
 
 
-    sql_path = "schema.sql"
-    # if len(sys.argv) < 2:
-    #     print("Usage: python migrate.py /path/to/schema.sql")
-    #     sys.exit(1)
+    # sql_path = "schema.sql"
+    if len(sys.argv) < 2:
+        print("Usage: python migrate.py /path/to/schema.sql")
+        sys.exit(1)
 
-    # sql_path = sys.argv[1]
+    sql_path = sys.argv[1]
     wait_for_db()
     run_sql_file(sql_path)
