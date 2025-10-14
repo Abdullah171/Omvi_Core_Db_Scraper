@@ -11,6 +11,7 @@ DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 
 
+
 def wait_for_db(max_seconds=120):
     start = time.time()
     while True:

@@ -7,3 +7,5 @@ pydantic
 scrapy-playwright
 chromium
 lxml-html-clean
+psycopg2-binary
+psycopg[binary]
